@@ -2,3 +2,4 @@ data
 set_git.sh
 examples
 model.h5
+history.pickle

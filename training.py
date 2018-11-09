@@ -6,6 +6,7 @@ from sklearn.utils import shuffle
 import cv2
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D
+import pickle
 
 BASE_DIR = '/home/workspace/CarND-Behavioral-Cloning-P3/data'
 
@@ -67,12 +68,16 @@ def train(train_samples, validation_samples):
     model.add(Dense(1))
     
     model.compile(loss='mse', optimizer='adam')
-    model.fit_generator(train_generator, 
+    history = model.fit_generator(train_generator, 
                        steps_per_epoch=len(train_samples),
                        validation_data=validation_generator,
                        validation_steps=len(validation_samples),
-                       epochs=2, verbose=1)
+                       epochs=1, verbose=1)
     model.save('model.h5')
+    print(history.history.keys())
+#     with open('history.pickle', 'wb') as file_pi:
+#         pickle.dump(history.history, file_pi)
+    
 
     
 if __name__ == '__main__':
