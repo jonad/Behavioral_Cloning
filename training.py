@@ -5,10 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import cv2
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D
+from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Dropout
 import pickle
+from keras.callbacks import TensorBoard, ModelCheckpoint
 
-BASE_DIR = '/home/workspace/CarND-Behavioral-Cloning-P3/data'
+BASE_DIR = '/home/workspace/CarND-Behavioral-Cloning-P3/img'
 
 def get_data(filename):
     samples = []
@@ -49,7 +50,7 @@ def generator(samples, batch_size=32):
             
             yield shuffle(X_train, y_train)
             
-def train(train_samples, validation_samples):
+def train(train_samples, validation_samples, callbacks_list):
     train_generator = generator(train_samples, batch_size=32)
     validation_generator = generator(validation_samples, batch_size=32)
     
@@ -63,8 +64,11 @@ def train(train_samples, validation_samples):
     model.add(Conv2D(64,(3, 3), activation='relu'))
     model.add(Flatten())
     model.add(Dense(100))
+    model.add(Dropout(0.2))
     model.add(Dense(50))
+    model.add(Dropout(0.2))
     model.add(Dense(10))
+    model.add(Dropout(0.2))
     model.add(Dense(1))
     
     model.compile(loss='mse', optimizer='adam')
@@ -72,17 +76,24 @@ def train(train_samples, validation_samples):
                        steps_per_epoch=len(train_samples),
                        validation_data=validation_generator,
                        validation_steps=len(validation_samples),
-                       epochs=1, verbose=1)
-    model.save('model.h5')
-    print(history.history.keys())
-#     with open('history.pickle', 'wb') as file_pi:
-#         pickle.dump(history.history, file_pi)
+                       epochs=5, verbose=1, callbacks=callbacks_list)
     
+    with open('./history.pickle', 'wb') as file_pi:
+        pickle.dump(history.history, file_pi)
+   
 
     
 if __name__ == '__main__':
     filename = 'driving.csv'
     train_samples, validation_samples = get_data(filename)
-    train(train_samples, validation_samples)
+    keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0,  
+          write_graph=True, write_images=True)
+    callback_list = [ModelCheckpoint(filepath='model_final.h5',
+                                   monitor='val_loss',
+                                   save_best_only=True),
+                    TensorBoard(log_dir='./logs', histogram_freq=0,  
+          write_graph=True, write_images=False)]
+    
+    train(train_samples, validation_samples, callback_list)
     
     

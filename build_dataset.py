@@ -5,12 +5,13 @@ import pandas as pd
 
 
 
-BASE_DIR = '/home/workspace/CarND-Behavioral-Cloning-P3/data'
+BASE_DIR = '/home/workspace/CarND-Behavioral-Cloning-P3/img'
 FILE_NAME = 'driving_log.csv'
 CORRECTION = 0.2
 
 if __name__ == '__main__':
-    data = pd.read_csv(os.path.join(BASE_DIR, FILE_NAME))
+    colnames = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
+    data = pd.read_csv(os.path.join(BASE_DIR, FILE_NAME), names= colnames)
     data['steering_left'] = data['steering'] + CORRECTION
     data['steering_right'] = data['steering'] - CORRECTION
     
