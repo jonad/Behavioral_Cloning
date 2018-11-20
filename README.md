@@ -7,5 +7,5 @@ Overview
 Predict the vehicle's steering angles given road images in a simulated environment.
 
 ## Model Architecture
-![Model Architecture](./model_Archittecture.png)
+![Model Architecture](./model_archittecture.png)
 
